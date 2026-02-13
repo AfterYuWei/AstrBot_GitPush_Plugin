@@ -1,12 +1,27 @@
 main:
   push:
-    - imports:
-        - https://cnb.cool/yuweinfo/config/-/blob/main/env.github.yml
-      stages:
-        - name: sync-to-github
-          image: tencentcom/git-sync
-          settings:
-            target_url: https://github.com/AfterYuWei/AstrBot_GitPush_Plugin.git
-            auth_type: https
-            username: ${GIT_USERNAME}
-            password: ${GIT_ACCESS_TOKEN}
+    - stages:
+        - name: sync-to-github-manual
+          image: alpine:latest
+          env:
+            GIT_USERNAME: ${GIT_USERNAME}
+            GIT_ACCESS_TOKEN: ${GIT_ACCESS_TOKEN}
+          commands:
+            - apk add --no-cache git
+
+            # 设置 git 身份（必须）
+            - git config --global user.name "$GIT_USERNAME"
+            - git config --global user.email "ci@local"
+
+            # 添加带 token 的远程仓库
+            - git remote remove target || true
+            - git remote add target https://${GIT_USERNAME}:${GIT_ACCESS_TOKEN}@github.com/AfterYuWei/AstrBot_GitPush_Plugin.git
+
+            # 打印确认
+            - git remote -v
+
+            # 推送全部分支
+            - git push target --all
+
+            # 推送 tags（可选但建议）
+            - git push target --tags
