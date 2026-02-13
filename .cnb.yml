@@ -1,11 +1,10 @@
 main:
   push:
-    - imports: https://cnb.cool/yuweinfo/config/-/blob/main/env.github.yml
+    - imports: https://cnb.cool/yuweinfo/config/-/raw/main/env.github.yml
+
     - stages:
-        - name: sync to github
+        - name: sync-to-github
           image: tencentcom/git-sync
           settings:
-            target_url: https://github.com/AfterYuWei/AstrBot_GitPush_Plugin.git
             auth_type: https
-            username: ${GIT_USERNAME}
-            password: ${GIT_ACCESS_TOKEN}
+            target_url: https://${GIT_USERNAME}:${GIT_ACCESS_TOKEN}@github.com/AfterYuWei/AstrBot_GitPush_Plugin.git
