@@ -1,0 +1,2 @@
+# AstrBot Git推送插件依赖
+# aiohttp 已包含在 AstrBot 中，无需额外安装
