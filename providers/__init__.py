@@ -1,7 +1,15 @@
 """
 Git 服务提供商模块
 """
-from .base import BaseGitProvider, CommitInfo, ReleaseInfo, RepoInfo
+# 先导入基础类型
+from .base import (
+    BaseGitProvider,
+    CommitInfo,
+    ReleaseInfo,
+    RepoInfo,
+)
+
+# 再导入具体实现
 from .github import GitHubProvider
 from .gitlab import GitLabProvider
 from .cnb import CNBProvider
