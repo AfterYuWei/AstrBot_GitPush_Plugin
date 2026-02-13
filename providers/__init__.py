@@ -1,7 +1,7 @@
 """
 Git 服务提供商模块
 """
-from .base import BaseGitProvider, CommitInfo, ReleaseInfo
+from .base import BaseGitProvider, CommitInfo, ReleaseInfo, RepoInfo
 from .github import GitHubProvider
 from .gitlab import GitLabProvider
 from .cnb import CNBProvider
@@ -10,6 +10,7 @@ __all__ = [
     "BaseGitProvider",
     "CommitInfo",
     "ReleaseInfo",
+    "RepoInfo",
     "GitHubProvider",
     "GitLabProvider",
     "CNBProvider",
