@@ -1,7 +1,7 @@
 """
 Git 服务提供商模块
 """
-# 先导入基础类型
+# 基础类型（无外部依赖，安全导入）
 from .base import (
     BaseGitProvider,
     CommitInfo,
@@ -9,10 +9,21 @@ from .base import (
     RepoInfo,
 )
 
-# 再导入具体实现
-from .github import GitHubProvider
-from .gitlab import GitLabProvider
-from .cnb import CNBProvider
+# 具体实现（可能依赖网络库）
+try:
+    from .github import GitHubProvider
+except ImportError:
+    GitHubProvider = None  # type: ignore
+
+try:
+    from .gitlab import GitLabProvider
+except ImportError:
+    GitLabProvider = None  # type: ignore
+
+try:
+    from .cnb import CNBProvider
+except ImportError:
+    CNBProvider = None  # type: ignore
 
 __all__ = [
     "BaseGitProvider",
@@ -24,12 +35,14 @@ __all__ = [
     "CNBProvider",
 ]
 
-# 提供商映射
-PROVIDER_MAP = {
-    "github": GitHubProvider,
-    "gitlab": GitLabProvider,
-    "cnb": CNBProvider,
-}
+# 提供商映射（排除未成功导入的）
+PROVIDER_MAP = {}
+if GitHubProvider:
+    PROVIDER_MAP["github"] = GitHubProvider
+if GitLabProvider:
+    PROVIDER_MAP["gitlab"] = GitLabProvider
+if CNBProvider:
+    PROVIDER_MAP["cnb"] = CNBProvider
 
 
 def create_provider(provider_type: str, token: str = "", api_url: str = "", **kwargs) -> BaseGitProvider:

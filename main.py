@@ -24,6 +24,7 @@ from .providers import (
     GitHubProvider,
     GitLabProvider,
     CNBProvider,
+    PROVIDER_MAP,
 )
 from .utils import (
     PluginConfig, 
@@ -101,35 +102,22 @@ class GitPushPlugin(Star):
         """初始化提供商"""
         self.providers = {}
         
-        # GitHub
-        github_config = self.config.get_provider_config("github")
-        if github_config and github_config.enabled:
-            self.providers["github"] = GitHubProvider(
-                token=github_config.token,
-                api_url=github_config.api_url
-            )
-            await self.providers["github"].init()
-            logger.info("GitHub 提供商已初始化")
+        provider_names = ["github", "gitlab", "cnb"]
         
-        # GitLab
-        gitlab_config = self.config.get_provider_config("gitlab")
-        if gitlab_config and gitlab_config.enabled:
-            self.providers["gitlab"] = GitLabProvider(
-                token=gitlab_config.token,
-                api_url=gitlab_config.api_url
-            )
-            await self.providers["gitlab"].init()
-            logger.info(f"GitLab 提供商已初始化 (API: {gitlab_config.api_url or '默认'})")
-        
-        # CNB
-        cnb_config = self.config.get_provider_config("cnb")
-        if cnb_config and cnb_config.enabled:
-            self.providers["cnb"] = CNBProvider(
-                token=cnb_config.token,
-                api_url=cnb_config.api_url
-            )
-            await self.providers["cnb"].init()
-            logger.info("CNB 提供商已初始化")
+        for name in provider_names:
+            config = self.config.get_provider_config(name)
+            if config and config.enabled:
+                provider_class = PROVIDER_MAP.get(name)
+                if provider_class is None:
+                    logger.warn(f"{name} 提供商模块加载失败，跳过")
+                    continue
+                
+                self.providers[name] = provider_class(
+                    token=config.token,
+                    api_url=config.api_url
+                )
+                await self.providers[name].init()
+                logger.info(f"{name} 提供商已初始化")
 
     async def _expand_group_configs(self):
         """展开群组配置为具体的仓库列表"""
