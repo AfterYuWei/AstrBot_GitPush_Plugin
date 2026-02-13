@@ -3,9 +3,11 @@ Git 服务提供商基类
 """
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Optional, Dict, Any, List
+from typing import Optional, Dict, Any, List, TYPE_CHECKING
 from datetime import datetime
-import aiohttp
+
+if TYPE_CHECKING:
+    import aiohttp
 
 
 @dataclass
@@ -75,7 +77,7 @@ class BaseGitProvider(ABC):
 
     def __init__(self, token: str = "", **kwargs):
         self.token = token
-        self.session: Optional[aiohttp.ClientSession] = None
+        self.session: Optional[Any] = None  # aiohttp.ClientSession
         self.config = kwargs
 
     @property
@@ -93,6 +95,7 @@ class BaseGitProvider(ABC):
     async def init(self):
         """初始化会话"""
         if not self.session:
+            import aiohttp
             self.session = aiohttp.ClientSession()
 
     async def close(self):
@@ -183,6 +186,7 @@ class BaseGitProvider(ABC):
         if not self.session:
             await self.init()
         
+        import aiohttp
         try:
             async with self.session.get(
                 url, 
@@ -204,6 +208,7 @@ class BaseGitProvider(ABC):
         if not self.session:
             await self.init()
         
+        import aiohttp
         all_data = []
         page = 1
         per_page = 100
