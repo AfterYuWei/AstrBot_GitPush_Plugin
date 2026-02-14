@@ -1,6 +1,12 @@
 name: astrbot_plugin_git_push
 display_name: Git仓库推送插件
-desc: 监听GitHub、GitLab、CNB仓库更新并推送到群聊/私聊，支持仓库和群组级别监听
-version: v1.0.0
 author: YourName
+version: 1.0.0
+description: 监听GitHub、GitLab、CNB仓库更新并推送到群聊/私聊，支持仓库和群组级别监听
 repo: https://github.com/AfterYuWei/AstrBot_GitPush_Plugin.git
+license: MIT
+tags:
+  - git
+  - github
+  - gitlab
+  - webhook
