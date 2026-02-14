@@ -70,9 +70,10 @@ if CNBProvider:
 class GitPushPlugin(Star):
     """Git仓库推送插件主类"""
 
-    def __init__(self, context: Context, config: AstrBotConfig = None):
+    def __init__(self, context: Context, config: AstrBotConfig = None, **kwargs):
         super().__init__(context)
-        self._raw_config = config if config else {}
+        # 兼容不同版本的 AstrBot，config 可能为 None
+        self._raw_config = dict(config) if config else {}
         self.config: Optional[PluginConfig] = None
         self.storage: Optional[DataStorage] = None
         self.cache: Optional[UpdateCache] = None
