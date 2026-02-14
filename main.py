@@ -16,23 +16,54 @@ from astrbot.api.event import filter, AstrMessageEvent
 from astrbot.api.star import Context, Star, register
 from astrbot.api import logger
 
-from .providers import (
+# 延迟导入以避免循环依赖
+import sys
+import os
+
+# 获取插件目录并添加到 sys.path
+_current_dir = os.path.dirname(os.path.abspath(__file__))
+if _current_dir not in sys.path:
+    sys.path.insert(0, _current_dir)
+
+# 使用绝对导入
+from providers.base import (
     BaseGitProvider,
     CommitInfo,
     ReleaseInfo,
     RepoInfo,
-    GitHubProvider,
-    GitLabProvider,
-    CNBProvider,
-    PROVIDER_MAP,
 )
-from .utils import (
+
+# 安全导入各 Provider（可能因依赖缺失而失败）
+try:
+    from providers.github import GitHubProvider
+except ImportError:
+    GitHubProvider = None  # type: ignore
+
+try:
+    from providers.gitlab import GitLabProvider
+except ImportError:
+    GitLabProvider = None  # type: ignore
+
+try:
+    from providers.cnb import CNBProvider
+except ImportError:
+    CNBProvider = None  # type: ignore
+
+from utils.config import (
     PluginConfig, 
     RepoWatchConfig, 
     GroupWatchConfig,
-    DataStorage, 
-    UpdateCache
 )
+from utils.storage import DataStorage, UpdateCache
+
+# 构建 PROVIDER_MAP
+PROVIDER_MAP = {}
+if GitHubProvider:
+    PROVIDER_MAP["github"] = GitHubProvider
+if GitLabProvider:
+    PROVIDER_MAP["gitlab"] = GitLabProvider
+if CNBProvider:
+    PROVIDER_MAP["cnb"] = CNBProvider
 
 
 @register("astrbot_plugin_git_push", "YourName", "Git仓库推送插件", "1.0.0")
