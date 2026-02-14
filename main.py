@@ -14,7 +14,7 @@ from typing import Optional, Dict, List, Set
 
 from astrbot.api.event import filter, AstrMessageEvent
 from astrbot.api.star import Context, Star, register
-from astrbot.api import logger
+from astrbot.api import logger, AstrBotConfig
 
 # 延迟导入以避免循环依赖
 import sys
@@ -70,7 +70,7 @@ if CNBProvider:
 class GitPushPlugin(Star):
     """Git仓库推送插件主类"""
 
-    def __init__(self, context: Context, config: Dict = None):
+    def __init__(self, context: Context, config: AstrBotConfig):
         super().__init__(context)
         self._raw_config = config or {}
         self.config: Optional[PluginConfig] = None

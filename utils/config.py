@@ -233,9 +233,15 @@ class PluginConfig:
             if key in data:
                 push_groups = data[key]
                 if isinstance(push_groups, str):
-                    try:
-                        self.push_groups = json.loads(push_groups)
-                    except:
+                    # 支持逗号分隔的格式
+                    if push_groups.strip():
+                        # 尝试 JSON 解析
+                        try:
+                            self.push_groups = json.loads(push_groups)
+                        except:
+                            # 尝试逗号分隔格式
+                            self.push_groups = [g.strip() for g in push_groups.split(",") if g.strip()]
+                    else:
                         self.push_groups = []
                 else:
                     self.push_groups = list(push_groups)
@@ -245,9 +251,13 @@ class PluginConfig:
             if key in data:
                 push_users = data[key]
                 if isinstance(push_users, str):
-                    try:
-                        self.push_users = json.loads(push_users)
-                    except:
+                    # 支持逗号分隔的格式
+                    if push_users.strip():
+                        try:
+                            self.push_users = json.loads(push_users)
+                        except:
+                            self.push_users = [u.strip() for u in push_users.split(",") if u.strip()]
+                    else:
                         self.push_users = []
                 else:
                     self.push_users = list(push_users)
