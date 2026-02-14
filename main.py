@@ -70,8 +70,9 @@ if CNBProvider:
 class GitPushPlugin(Star):
     """Git仓库推送插件主类"""
 
-    def __init__(self, context: Context):
+    def __init__(self, context: Context, config: Dict = None):
         super().__init__(context)
+        self._raw_config = config or {}
         self.config: Optional[PluginConfig] = None
         self.storage: Optional[DataStorage] = None
         self.cache: Optional[UpdateCache] = None
@@ -84,12 +85,15 @@ class GitPushPlugin(Star):
     async def initialize(self):
         """初始化插件"""
         # 加载配置
-        raw_config = self._load_config()
-        self.config = PluginConfig.from_dict(raw_config)
+        self.config = PluginConfig.from_dict(self._raw_config)
         
-        # 初始化存储
-        data_dir = self.context.get_data_dir()
-        self.storage = DataStorage(data_dir)
+        # 初始化存储 - 使用插件数据目录
+        import os
+        # AstrBot 的数据目录通常在 data/plugins_data/<plugin_name>/ 下
+        # 或者直接使用 AstrBot 的 data 目录
+        base_data_dir = os.path.join(os.getcwd(), "data", "plugins_data", "astrbot_plugin_git_push")
+        os.makedirs(base_data_dir, exist_ok=True)
+        self.storage = DataStorage(base_data_dir)
         self.cache = UpdateCache(self.storage)
         
         # 初始化提供商
@@ -105,29 +109,6 @@ class GitPushPlugin(Star):
         logger.info(f"Git推送插件初始化完成")
         logger.info(f"已启用提供商: {list(self.providers.keys())}")
         logger.info(f"监听仓库数: {len(self.config.watch_repos) + len(self._expanded_repos)}")
-
-    def _load_config(self) -> Dict:
-        """加载配置"""
-        config = {}
-        
-        try:
-            if hasattr(self.context, 'get_config'):
-                config = self.context.get_config() or {}
-        except:
-            pass
-        
-        if not config:
-            try:
-                import os
-                import json
-                config_file = os.path.join(self.context.get_data_dir(), "config.json")
-                if os.path.exists(config_file):
-                    with open(config_file, "r", encoding="utf-8") as f:
-                        config = json.load(f)
-            except:
-                pass
-        
-        return config
 
     async def _init_providers(self):
         """初始化提供商"""
